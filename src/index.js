@@ -1,5 +1,3 @@
-import 'dotenv/config'
-
 import * as csstree from 'css-tree';
 
 import ff from './fontforge/index.js';
