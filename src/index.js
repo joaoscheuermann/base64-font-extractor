@@ -1,28 +1,27 @@
+import 'dotenv/config'
+
 import * as csstree from 'css-tree';
 
-import CloudConvert from 'cloudconvert';
+import ff from './fontforge/index.js';
 import fs from 'fs';
 import parseDataURL from 'data-urls';
 import path from 'path';
 import { program } from 'commander';
-
-// TODO: Implementar a conversão de fontes para OTF e TTF usando Cloud Convert
-// https://github.com/cloudconvert/cloudconvert-node
 
 program.command('download')
   .argument('<url>', 'url to download the fonts from')
   .action(async (urlStr, options) => {
     const url = new URL(urlStr);
 
-    console.log('Downloading fonts from:', url.href);
+    console.log('Downloading CSS file from:', url.href);
 
     const req = await fetch(url.href);
     const text = await req.text();
 
-    console.log('Downloaded', text.length, 'bytes');
-
+    // Generates the AST from the CSS file
     const ast = csstree.parse(text);
 
+    // Finds all the font-face rules in the CSS file
     const fonts = csstree.findAll(ast, (node, item, list) =>
       node.type === 'Atrule' && node.name === 'font-face'
     ).map((node) => {
@@ -47,6 +46,8 @@ program.command('download')
       const name = nameNode.value;
       const url = urlNode.value;
       const format = formatStringNode.value;
+
+      // Parses the data URL and get all the binary information required to export the font
       const data = parseDataURL(url);
 
       return {
@@ -57,7 +58,7 @@ program.command('download')
     });
 
     if (fs.existsSync('output')) {
-      fs.rmdirSync('output', { recursive: true });
+      fs.rmSync('output', { recursive: true });
     }
 
     fs.mkdirSync('output');
@@ -67,6 +68,19 @@ program.command('download')
 
       const defaultBuffer = font.data.body
       fs.writeFileSync(path.join('output', `${font.name}.${font.format}`), defaultBuffer, 'binary')
+
+      if (font.format !== 'otf' || font.format !== 'ttf') {
+        const cwd = path.join(process.cwd(), 'output');
+        const input = `${font.name}.${font.format}`;
+        const output = `${font.name}.otf`;
+
+        console.log('Converting', input, 'to', output);
+
+        await ff(input, output, { cwd })
+          .catch((err) => {
+            console.error('Error:', err);
+          });
+      }
     }
   });
 
