@@ -74,7 +74,7 @@ program.command('download')
 
         console.log('Converting', input, 'to', output);
 
-        await ff(input, output, { cwd })
+        await ff(font.name, input, output, { cwd })
           .catch((err) => {
             console.error('Error:', err);
           });
