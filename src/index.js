@@ -64,7 +64,7 @@ program.command('download')
     fs.mkdirSync('output');
 
     for (const font of fonts) {
-      console.log('Writing', font.name, 'to disk');
+      console.log('Writing', font.name.exportName, 'to disk');
 
       const defaultBuffer = font.data.body
       fs.writeFileSync(path.join('output', `${font.name.inputName}.${font.format}`), defaultBuffer, 'binary')

@@ -47,10 +47,17 @@ export const parseFontName = (currentFontName) => {
     .map(capitalizeFirstLetter)
     .join(' ')
 
+  // TODO: fix fontWheight
+  const fontWheight = result
+    .filter((segment) => wheights.some(regex => regex.test(segment)))
+    .map(capitalizeFirstLetter)
+    .join(' ')
+
   return {
     inputName: currentFontName,
     exportName: `${fontFamily} ${fontSubFamily}`.toLowerCase().replace(/ /g, '_'),
     fontFamily,
     fontSubFamily: fontSubFamily.length ? fontSubFamily : 'Regular',
+    fontWheight: fontWheight.length ? fontWheight : 'Regular',
   }
 }
