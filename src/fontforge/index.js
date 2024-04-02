@@ -1,9 +1,17 @@
 import { exec } from 'child_process';
 
+// TODO: set TTF names for the font
+// SetTTFName(0x409,1,"Font Family Name") ex: "Arial" or "Times New Roman" or "Argesta Headline"
+// SetTTFName(0x409,2,"Font Subfamily Name") ex: "Regular" or "Bold" or "Bold Italic" or "Regular"
+
 export default function ff(name, input, output, options) {
   return new Promise((resolve, reject) => {
 
-    const child = exec(`fontforge -lang=ff -c "Open($2); SetFontNames($1, $1, $1); Generate($3); Quit();" ${name} ${input} ${output}`, options)
+    const fontFamily = name.fontFamily.replace(/\s/, '_')
+    const fontSubFamily = name.fontSubFamily.replace(/\s/, '_')
+    const fontFullName = `${fontFamily}_${fontSubFamily}`
+
+    const child = exec(`fontforge -lang=ff -c "Open('${input}'); SetFontNames('${fontFamily}','${fontSubFamily}', '${fontFullName}'); SetTTFName(0x409,1,'${name.fontFamily}'); SetTTFName(0x409,2,'${name.fontSubFamily}'); SetTTFName(0x409,4,'${name.fontFamily} ${name.fontSubFamily}'); Generate('${output}'); Quit();"`, options)
 
     let stdout = null
     let stderr = null

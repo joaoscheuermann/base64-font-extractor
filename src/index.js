@@ -3,9 +3,11 @@ import * as csstree from 'css-tree';
 import ff from './fontforge/index.js';
 import fs from 'fs';
 import parseDataURL from 'data-urls';
+import { parseFontName } from './utils/index.js';
 import path from 'path';
 import { program } from 'commander';
 
+program.version('0.0.1');
 program.command('download')
   .argument('<url>', 'url to download the fonts from')
   .action(async (urlStr, options) => {
@@ -41,7 +43,7 @@ program.command('download')
 
       const formatStringNode = csstree.find(formatNode, (node) => node.type === 'String')
 
-      const name = nameNode.value;
+      const name = parseFontName(nameNode.value);
       const url = urlNode.value;
       const format = formatStringNode.value;
 
@@ -65,12 +67,12 @@ program.command('download')
       console.log('Writing', font.name, 'to disk');
 
       const defaultBuffer = font.data.body
-      fs.writeFileSync(path.join('output', `${font.name}.${font.format}`), defaultBuffer, 'binary')
+      fs.writeFileSync(path.join('output', `${font.name.inputName}.${font.format}`), defaultBuffer, 'binary')
 
       if (font.format !== 'otf' || font.format !== 'ttf') {
         const cwd = path.join(process.cwd(), 'output');
-        const input = `${font.name}.${font.format}`;
-        const output = `${font.name}.otf`;
+        const input = `${font.name.inputName}.${font.format}`;
+        const output = `${font.name.exportName}.otf`;
 
         console.log('Converting', input, 'to', output);
 
