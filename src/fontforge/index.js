@@ -3,11 +3,12 @@ import { exec } from 'child_process';
 export default function ff(name, input, output, options) {
   return new Promise((resolve, reject) => {
 
-    const fontFamily = name.fontFamily.replace(/\s/, '_')
-    const fontSubFamily = name.fontSubFamily.replace(/\s/, '_')
-    const fontFullName = `${fontFamily}_${fontSubFamily}`
+    const fontFamily = name.fontFamily.replaceAll(/\s/g, '_').trim()
+    const fontSubFamily = name.fontSubFamily.replaceAll(/\s/g, '_').trim()
 
-    const child = exec(`fontforge -lang=ff -c "Open('${input}'); SetFontNames('${fontFamily}','${fontSubFamily}', '${fontFullName}', '${name.fontWheight}'); SetTTFName(0x409,1,'${name.fontFamily}'); SetTTFName(0x409,2,'${name.fontSubFamily}'); SetTTFName(0x409,4,'${name.fontFamily} ${name.fontSubFamily}'); Generate('${output}'); Quit();"`, options)
+    const fontFullName = [fontFamily, fontSubFamily].map(str => str.split(/_|\s/)).flat().join('_')
+
+    const child = exec(`fontforge -lang=ff -c "Open('${input}'); SetFontNames('${fontFamily}','${fontSubFamily}', '${fontFullName}', '${name.fontWheight}'); SetTTFName(0x409,1,'${name.fontFamily}'); SetTTFName(0x409,2,'${name.fontSubFamily.toLowerCase()}'); SetTTFName(0x409,4,'${name.fontFamily} ${name.fontSubFamily}'); Generate('${output}'); Quit();"`, options)
 
     let stdout = null
     let stderr = null
