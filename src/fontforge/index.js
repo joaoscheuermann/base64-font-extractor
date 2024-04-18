@@ -8,7 +8,7 @@ export default function ff(name, input, output, options) {
 
     const fontFullName = [fontFamily, fontSubFamily].map(str => str.split(/_|\s/)).flat().join('_')
 
-    const child = exec(`fontforge -lang=ff -c "Open('${input}'); SetFontNames('${fontFamily}','${fontSubFamily}', '${fontFullName}', '${name.fontWheight}'); SetTTFName(0x409,1,'${name.fontFamily}'); SetTTFName(0x409,2,'${name.fontSubFamily.toLowerCase()}'); SetTTFName(0x409,4,'${name.fontFamily} ${name.fontSubFamily}'); Generate('${output}'); Quit();"`, options)
+    const child = exec(`fontforge -lang=ff -c "Open('${input}'); SetFontNames('${fontFamily}','${fontFamily}', '${fontFullName}', '${name.fontWheight}'); SetTTFName(0x409,1,'${name.fontFamily}'); SetTTFName(0x409,2,'${name.fontSubFamily.toLowerCase()}'); SetTTFName(0x409,4,'${name.fontFamily} ${name.fontSubFamily}'); Generate('${output}'); Quit();"`, options)
 
     let stdout = null
     let stderr = null
